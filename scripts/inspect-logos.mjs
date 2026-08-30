@@ -1,0 +1,13 @@
+import { chromium } from "playwright";
+const url = process.env.QA_URL || "http://localhost:3000";
+const browser = await chromium.launch({ headless: true, executablePath: "/usr/bin/chromium", args: ["--no-sandbox", "--disable-dev-shm-usage"] });
+const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+await page.goto(url, { waitUntil: "domcontentloaded" });
+await page.locator('input[placeholder*="Search team"]').waitFor({ state: "visible", timeout: 15000 });
+await page.getByRole("button", { name: /Settings/ }).click();
+await page.getByRole("button", { name: /Browse competitions/ }).click();
+await page.waitForTimeout(1000);
+console.log((await page.locator("body").innerText()).slice(-2500));
+console.log({ browseRows: await page.locator(".browse-league").count(), marks: await page.locator(".browse-league__logo").count(), loading: await page.locator(".browser-loading").count(), error: await page.locator(".browser-note--error").count() });
+await page.screenshot({ path: "/tmp/inspect-logos.png", fullPage: false });
+await browser.close();

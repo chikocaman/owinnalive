@@ -1,0 +1,30 @@
+# Netlify deployment config for FootyScores Pro.
+#
+# The backend runs as Netlify Functions (see netlify/functions/*.mts) instead
+# of the standalone Express server in server/index.ts. Netlify auto-detects
+# and bundles TypeScript functions from the `functions` directory below at
+# deploy time (and routes to them by each function's own `path` config), so
+# nothing extra is needed here for that.
+#
+# Required env vars (set in Site configuration -> Environment variables):
+#   DATABASE_URL, JWT_SECRET, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY,
+#   VAPID_SUBJECT, BUILT_IN_FORGE_API_URL, BUILT_IN_FORGE_API_KEY
+# All are optional: push notifications (VAPID_*, DATABASE_URL) and the
+# manus-storage passthrough (BUILT_IN_FORGE_*) degrade gracefully when unset.
+
+[build]
+  command = "pnpm run build:netlify"
+  publish = "dist/public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Client-side routing (wouter) fallback: any path that isn't a static asset
+# or one of the /api/* function paths above serves index.html. Function
+# paths are matched before redirects, so this never shadows /api/espn/*,
+# /api/malawi/*, or /api/push/*.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

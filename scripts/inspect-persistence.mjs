@@ -1,0 +1,17 @@
+import { chromium } from "playwright";
+const url = process.env.QA_URL || "http://127.0.0.1:3000/";
+const browser = await chromium.launch({ headless: true, executablePath: "/usr/bin/chromium", args: ["--no-sandbox", "--disable-dev-shm-usage"] });
+const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+await page.goto(url, { waitUntil: "domcontentloaded" });
+await page.locator('input[placeholder*="Search team"]').waitFor({ state: "visible" });
+await page.waitForTimeout(500);
+const filter = page.locator("details.filter-menu");
+await filter.locator("summary").click();
+await filter.locator("button").filter({ hasText: "Upcoming" }).first().click();
+await page.waitForTimeout(500);
+console.log("before", await page.locator("details.filter-menu summary").innerText(), await page.evaluate(() => localStorage.getItem("footscores:view")));
+await page.reload({ waitUntil: "domcontentloaded" });
+await page.locator('input[placeholder*="Search team"]').waitFor({ state: "visible" });
+await page.waitForTimeout(700);
+console.log("after", await page.locator("details.filter-menu summary").innerText(), await page.evaluate(() => localStorage.getItem("footscores:view")));
+await browser.close();
