@@ -54,19 +54,22 @@ function str(value: unknown) {
 
 async function fetchJson<T>(url: string, attempts = 2, timeoutMs = 15_000): Promise<T> {
   let lastError: unknown;
+  const urls = url.startsWith("/api/espn/") ? [url, `https://${url.slice("/api/espn/".length)}`] : [url];
   for (let attempt = 0; attempt <= attempts; attempt += 1) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetch(url, { signal: controller.signal, headers: { Accept: "application/json" } });
-      if (!response.ok) throw new Error(`Request failed (${response.status})`);
-      return (await response.json()) as T;
-    } catch (error) {
-      lastError = error;
-      if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
-    } finally {
-      clearTimeout(timer);
+    for (const requestUrl of urls) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetch(requestUrl, { signal: controller.signal, headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error(`Request failed (${response.status})`);
+        return (await response.json()) as T;
+      } catch (error) {
+        lastError = error;
+      } finally {
+        clearTimeout(timer);
+      }
     }
+    if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
   }
   throw lastError instanceof Error ? lastError : new Error("Request failed");
 }
