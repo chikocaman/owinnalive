@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import pushFunction, { config } from "./push.mts";
+import pushFunction, { config } from "../../netlify/functions/push.mts";
 
 describe("netlify push function", () => {
   it("is configured for all three push paths", () => {

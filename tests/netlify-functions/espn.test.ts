@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import espnFunction, { config } from "./espn.mts";
+import espnFunction, { config } from "../../netlify/functions/espn.mts";
 
 const originalFetch = global.fetch;
 

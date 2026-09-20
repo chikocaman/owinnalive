@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import malawiFunction, { config } from "./malawi.mts";
+import malawiFunction, { config } from "../../netlify/functions/malawi.mts";
 
 const originalFetch = global.fetch;
 

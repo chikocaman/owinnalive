@@ -4,6 +4,6 @@ export default defineConfig({
   test: {
     name: "server",
     environment: "node",
-    include: ["server/**/*.test.ts", "netlify/functions/**/*.test.ts"],
+    include: ["server/**/*.test.ts", "tests/**/*.test.ts"],
   },
 });
